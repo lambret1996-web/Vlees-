@@ -4,30 +4,17 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname;
 
-    // 自制Base64解码函数，不依赖运行时内置对象
-    function base64Decode(str) {
+    // 标准Web API Base64解码，不依赖Buffer、atob
+    function base64ToUtf8(b64) {
       try {
-        const keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-        str = String(str).replace(/[^A-Za-z0-9\+\/\=]/g, "");
-        let output = "";
-        let chr1, chr2, chr3;
-        let enc1, enc2, enc3, enc4;
-        let i = 0;
-        do {
-          enc1 = keyStr.indexOf(str.charAt(i++));
-          enc2 = keyStr.indexOf(str.charAt(i++));
-          enc3 = keyStr.indexOf(str.charAt(i++));
-          enc4 = keyStr.indexOf(str.charAt(i++));
-          chr1 = (enc1 << 2) | (enc2 >> 4);
-          chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
-          chr3 = ((enc3 & 3) << 6) | enc4;
-          output = output + String.fromCharCode(chr1);
-          if (enc3 !== 64) output = output + String.fromCharCode(chr2);
-          if (enc4 !== 64) output = output + String.fromCharCode(chr3);
-        } while (i < str.length);
-        return output;
+        //补齐等号
+        const pad = (4 - (b64.length % 4)) % 4;
+        b64 = b64.padEnd(b64.length + pad, "=");
+        const binaryString = atob(b64);
+        const bytes = Uint8Array.from([...binaryString].map(c => c.charCodeAt(0)));
+        return new TextDecoder("utf-8").decode(bytes);
       } catch (e) {
-        return str;
+        return b64;
       }
     }
 
@@ -136,7 +123,7 @@ function openSR(){
       try {
         const res = await fetch(src,{redirect:"follow"});
         let text = await res.text();
-        let decoded = base64Decode(text);
+        let decoded = base64ToUtf8(text);
         const lines = decoded.split('\n').filter(line => line.includes(':443'));
         return new Response(lines.join('\n'), { headers: { "content-type": "text/plain;charset=utf-8" } })
       } catch (e) {
