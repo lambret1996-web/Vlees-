@@ -4,7 +4,7 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname;
 
-    //管理面板
+    //管理面板1
     if(path === `/${PASSWORD}`){
       return new Response(`
 <!DOCTYPE html>
