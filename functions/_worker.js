@@ -1,7 +1,7 @@
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
-    // 密码已设置为66668888
+    // 密码已设置为  66668888
     const PASSWORD = "66668888";
 
     if (url.pathname === `/${PASSWORD}`) {
