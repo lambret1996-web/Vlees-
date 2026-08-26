@@ -11,7 +11,7 @@ export default {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial‑scale=1.0">
-<title>443订阅过滤器</title>
+<title>443端口订阅过滤器</title>
 <style>
 *{box-sizing:border-box}
 body{padding:24px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;max-width:720px;margin:0 auto;background:#f0f4f8}
@@ -88,7 +88,7 @@ function clearAll(){
   btnSR.disabled = true;
 }
 
-//一键导入圈X1
+//一键导入圈X
 function openQX(){
   window.location.href = `quantumult-x:///import-subscription?url=${encodeURIComponent(finalUrl)}`;
 }
@@ -111,14 +111,17 @@ function openSR(){
       try {
         const res = await fetch(src,{redirect:"follow"});
         let text = await res.text();
-
-        let decoded;
+        let decoded = text;
         try{
-          decoded = Buffer.from(text, 'base64').toString('utf8');
+          // 补全base64填充位
+          const padLen = (4 - text.length % 4) % 4;
+          const padded = text.padEnd(text.length + padLen, '=');
+          // Cloudflare edge runtime原生支持atob
+          decoded = atob(padded);
         }catch(e){
+          //解码失败直接使用原文（明文订阅）
           decoded = text;
         }
-
         const lines = decoded.split('\n').filter(line => line.includes(':443'));
         return new Response(lines.join('\n'), { headers: { "content-type": "text/plain;charset=utf-8" } })
       } catch (e) {
