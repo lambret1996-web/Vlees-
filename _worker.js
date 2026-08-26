@@ -1,6 +1,5 @@
 export default {
   async fetch(request, env, ctx) {
-    //密码留空，直接访问根路径打开面板
     const PASSWORD = "";
     const url = new URL(request.url);
     const path = url.pathname;
@@ -62,7 +61,16 @@ async function copyLink(){
       try {
         const res = await fetch(src,{redirect:"follow"});
         let text = await res.text();
-        const lines = text.split('\n').filter(line => line.includes(':443'));
+
+        let decoded;
+        try{
+          // Cloudflare环境使用Buffer解码base64，不用浏览器atob
+          decoded = Buffer.from(text, 'base64').toString('utf8');
+        }catch(e){
+          decoded = text;
+        }
+
+        const lines = decoded.split('\n').filter(line => line.includes(':443'));
         return new Response(lines.join('\n'), { headers: { "content-type": "text/plain;charset=utf-8" } })
       } catch (e) {
         return new Response("订阅拉取失败：" + e.message, { status: 500 })
