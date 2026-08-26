@@ -4,17 +4,30 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname;
 
-    // 标准Web API Base64解码，不依赖Buffer、atob
-    function base64ToUtf8(b64) {
+    // 纯手写Base64解码，不依赖运行时API
+    function base64Decode(input) {
       try {
-        //补齐等号
-        const pad = (4 - (b64.length % 4)) % 4;
-        b64 = b64.padEnd(b64.length + pad, "=");
-        const binaryString = atob(b64);
-        const bytes = Uint8Array.from([...binaryString].map(c => c.charCodeAt(0)));
-        return new TextDecoder("utf-8").decode(bytes);
+        const key = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        input = String(input).replace(/[^A-Za-z0-9\+\/]/g, "");
+        let output = "";
+        let i = 0;
+        let chr1, chr2, chr3;
+        let enc1, enc2, enc3, enc4;
+        while (i < input.length) {
+          enc1 = key.indexOf(input.charAt(i++));
+          enc2 = key.indexOf(input.charAt(i++));
+          enc3 = key.indexOf(input.charAt(i++));
+          enc4 = key.indexOf(input.charAt(i++));
+          chr1 = (enc1 << 2) | (enc2 >> 4);
+          chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+          chr3 = ((enc3 & 3) << 6) | enc4;
+          output = output + String.fromCharCode(chr1);
+          if (enc3 !== 64) output += String.fromCharCode(chr2);
+          if (enc4 !== 64) output += String.fromCharCode(chr3);
+        }
+        return output;
       } catch (e) {
-        return b64;
+        return input;
       }
     }
 
@@ -27,42 +40,150 @@ export default {
 <meta name="viewport" content="width=device-width, initial‑scale=1.0">
 <title>443端口订阅过滤器</title>
 <style>
-*{box-sizing:border-box}
-body{padding:24px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;max-width:720px;margin:0 auto;background:#f0f4f8}
-h2{margin-top:0;margin-bottom:20px;color:#1f2937;font-weight:600}
-#subInput{width:100%;padding:14px 16px;font-size:16px;border:1px solid #cbd5e1;border-radius:12px;margin-bottom:16px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
-.btn-wrap{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
-.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
-button{padding:12px 14px;font-size:15px;border:none;border-radius:10px;cursor:pointer;transition:all .2s ease}
-.btn-primary{background:#2563eb;color:#fff}
-.btn-primary:active{background:#1d4ed8;transform:scale(0.98)}
-.btn-success{background:#0891b2;color:#fff}
-.btn-success:active{background:#0e7490;transform:scale(0.98)}
-.btn-warning{background:#d97706;color:#fff}
-.btn-warning:active{background:#b45309;transform:scale(0.98)}
-.btn-gray{background:#64748b;color:#fff}
-.btn-gray:active{background:#475569;transform:scale(0.98)}
-#out{width:100%;padding:16px;background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;white-space:pre-wrap;word-break:break-all;min-height:120px;font-size:14px;color:#333;box-shadow:0 1px 4px rgba(0,0,0,0.05)}
-.tip{font-size:13px;color:#64748b;margin-top:8px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  min-height:100vh;
+  background:linear-gradient(135deg,#141e30,#243b55);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  padding:28px 16px;
+  color:#fff;
+}
+.container{
+  max-width:640px;
+  margin:0 auto;
+}
+.card{
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(12px);
+  border-radius:20px;
+  padding:28px;
+  border:1px solid rgba(255,255,255,0.12);
+  box-shadow:0 8px 32px rgba(0,0,0,0.25);
+}
+.title{
+  font-size:22px;
+  text-align:center;
+  margin-bottom:24px;
+  font-weight:600;
+  letter-spacing:1px;
+}
+.desc{
+  font-size:14px;
+  color:#b8c2cc;
+  text-align:center;
+  margin-bottom:20px;
+}
+#subInput{
+  width:100%;
+  background:rgba(255,255,255,0.1);
+  border:1px solid rgba(255,255,255,0.18);
+  border-radius:12px;
+  padding:16px;
+  color:#fff;
+  font-size:15px;
+  outline:none;
+  transition:.25s;
+}
+#subInput:focus{
+  border-color:#409eff;
+  box-shadow:0 0 0 3px rgba(64,158,255,0.2);
+}
+#subInput::placeholder{color:#909fa8}
+.btn-group-top{
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:10px;
+  margin:16px 0;
+}
+.btn-group-bottom{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:20px;
+}
+button{
+  padding:14px 10px;
+  border-radius:12px;
+  border:none;
+  font-size:15px;
+  font-weight:500;
+  cursor:pointer;
+  transition:all .2s ease;
+}
+button:disabled{
+  opacity:0.35;
+  cursor:not-allowed;
+  transform:none !important;
+}
+.btn-main{
+  background:linear-gradient(90deg,#3671e9,#409eff);
+  color:#fff;
+}
+.btn-main:active{transform:scale(0.97)}
+.btn-copy{
+  background:#27ae60;
+  color:#fff;
+}
+.btn-copy:active{transform:scale(0.97)}
+.btn-qx{
+  background:#9b59b6;
+  color:#fff;
+}
+.btn-qx:active{transform:scale(0.97)}
+.btn-sr{
+  background:#e67e22;
+  color:#fff;
+}
+.btn-sr:active{transform:scale(0.97)}
+.btn-clear{
+  width:100%;
+  background:rgba(255,255,255,0.12);
+  color:#dee2e6;
+  margin-bottom:18px;
+}
+#out{
+  width:100%;
+  min-height:130px;
+  background:rgba(0,0,0,0.25);
+  border-radius:12px;
+  padding:16px;
+  white-space:pre-wrap;
+  word-break:break-all;
+  font-size:14px;
+  color:#a5d6ff;
+  border:1px solid rgba(255,255,255,0.1);
+}
+.tip{
+  margin-top:12px;
+  font-size:13px;
+  color:#8798a7;
+  text-align:center;
+}
 </style>
 </head>
 <body>
-<h2>443端口订阅过滤器</h2>
-<input id="subInput" placeholder="粘贴原始订阅链接">
+<div class="container">
+  <div class="card">
+    <h2 class="title">443端口订阅过滤器</h2>
+    <div class="desc">过滤订阅，仅保留 :443 节点，一键导入小火箭 / 圈X</div>
+    <input id="subInput" placeholder="粘贴你的原始订阅链接">
 
-<div class="btn-row">
-  <button class="btn-primary" onclick="gen()">生成过滤后的订阅地址</button>
-  <button class="btn-success" id="copyBtn" onclick="copyLink()" disabled>一键复制链接</button>
-  <button class="btn-gray" onclick="clearAll()">一键清空</button>
+    <div class="btn-group-top">
+      <button class="btn-main" onclick="gen()">生成过滤订阅链接</button>
+      <button class="btn-copy" id="copyBtn" onclick="copyLink()" disabled>复制链接</button>
+    </div>
+
+    <div class="btn-group-bottom">
+      <button class="btn-qx" id="btnQuantumultX" onclick="openQX()" disabled>导入圈X</button>
+      <button class="btn-sr" id="btnShadowrocket" onclick="openSR()" disabled>导入小火箭</button>
+    </div>
+
+    <button class="btn-clear" onclick="clearAll()">清空全部内容</button>
+
+    <pre id="out"></pre>
+    <div class="tip">先粘贴订阅并生成链接，导入按钮才会激活</div>
+  </div>
 </div>
-
-<div class="btn-wrap">
-  <button class="btn-warning" id="btnQuantumultX" onclick="openQX()" disabled>一键导入圈X</button>
-  <button class="btn-primary" id="btnShadowrocket" onclick="openSR()" disabled>一键导入小火箭</button>
-</div>
-
-<pre id="out"></pre>
-<div class="tip">说明：导入按钮需要先成功生成订阅链接才可点击</div>
 
 <script>
 let finalUrl = "";
@@ -74,7 +195,7 @@ const btnSR = document.getElementById('btnShadowrocket');
 
 function gen(){
   const origin = inputEl.value.trim();
-  if(!origin){alert('请粘贴订阅链接');return;}
+  if(!origin){alert('请先粘贴订阅链接');return;}
   const params = new URLSearchParams();
   params.set("src", origin);
   finalUrl = location.origin + "/filter?" + params.toString();
@@ -87,7 +208,7 @@ function gen(){
 async function copyLink(){
   try{
     await navigator.clipboard.writeText(finalUrl);
-    alert("复制成功！");
+    alert("✅ 链接复制成功");
   }catch(err){
     alert("复制失败，请手动选中复制");
   }
@@ -109,6 +230,7 @@ function openSR(){
   window.location.href = `shadowrocket://add/subscribe?url=${encodeURIComponent(finalUrl)}`;
 }
 </script>
+  </div>
 </body>
 </html>
       `, { headers: { "content-type": "text/html;charset=utf-8" } })
@@ -123,7 +245,7 @@ function openSR(){
       try {
         const res = await fetch(src,{redirect:"follow"});
         let text = await res.text();
-        let decoded = base64ToUtf8(text);
+        let decoded = base64Decode(text);
         const lines = decoded.split('\n').filter(line => line.includes(':443'));
         return new Response(lines.join('\n'), { headers: { "content-type": "text/plain;charset=utf-8" } })
       } catch (e) {
