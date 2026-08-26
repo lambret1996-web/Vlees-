@@ -4,6 +4,33 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname;
 
+    // 自制Base64解码函数，不依赖运行时内置对象
+    function base64Decode(str) {
+      try {
+        const keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+        str = String(str).replace(/[^A-Za-z0-9\+\/\=]/g, "");
+        let output = "";
+        let chr1, chr2, chr3;
+        let enc1, enc2, enc3, enc4;
+        let i = 0;
+        do {
+          enc1 = keyStr.indexOf(str.charAt(i++));
+          enc2 = keyStr.indexOf(str.charAt(i++));
+          enc3 = keyStr.indexOf(str.charAt(i++));
+          enc4 = keyStr.indexOf(str.charAt(i++));
+          chr1 = (enc1 << 2) | (enc2 >> 4);
+          chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+          chr3 = ((enc3 & 3) << 6) | enc4;
+          output = output + String.fromCharCode(chr1);
+          if (enc3 !== 64) output = output + String.fromCharCode(chr2);
+          if (enc4 !== 64) output = output + String.fromCharCode(chr3);
+        } while (i < str.length);
+        return output;
+      } catch (e) {
+        return str;
+      }
+    }
+
     if (path === `/${PASSWORD}` || path === "/") {
       return new Response(`
 <!DOCTYPE html>
@@ -88,11 +115,9 @@ function clearAll(){
   btnSR.disabled = true;
 }
 
-//一键导入圈X
 function openQX(){
   window.location.href = `quantumult-x:///import-subscription?url=${encodeURIComponent(finalUrl)}`;
 }
-//一键导入小火箭Shadowrocket
 function openSR(){
   window.location.href = `shadowrocket://add/subscribe?url=${encodeURIComponent(finalUrl)}`;
 }
@@ -111,17 +136,7 @@ function openSR(){
       try {
         const res = await fetch(src,{redirect:"follow"});
         let text = await res.text();
-        let decoded = text;
-        try{
-          // 补全base64填充位
-          const padLen = (4 - text.length % 4) % 4;
-          const padded = text.padEnd(text.length + padLen, '=');
-          // Cloudflare edge runtime原生支持atob
-          decoded = atob(padded);
-        }catch(e){
-          //解码失败直接使用原文（明文订阅）
-          decoded = text;
-        }
+        let decoded = base64Decode(text);
         const lines = decoded.split('\n').filter(line => line.includes(':443'));
         return new Response(lines.join('\n'), { headers: { "content-type": "text/plain;charset=utf-8" } })
       } catch (e) {
