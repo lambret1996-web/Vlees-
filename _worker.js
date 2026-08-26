@@ -1,23 +1,22 @@
 export default {
   async fetch(request, env, ctx) {
-    const PASSWORD = "";
+    const PASSWORD = "66668888";
     const url = new URL(request.url);
     const path = url.pathname;
 
-    //管理面板1
-    if(path === `/${PASSWORD}`){
+    if (path === `/${PASSWORD}`) {
       return new Response(`
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial‑scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>443订阅过滤器</title>
 <style>
 body{padding:20px;font-family:system-ui}
 input{width:100%;padding:10px;margin:10px 0;box-sizing:border-box}
 button{padding:10px 16px;font-size:16px}
-pre{margin-top:16px;white‑space:pre‑wrap;background:#f4f4f4;padding:12px;border‑radius:6px}
+pre{margin-top:16px;white-space:pre-wrap;background:#f4f4f4;padding:12px;border-radius:6px}
 </style>
 </head>
 <body>
@@ -35,23 +34,21 @@ function gen(){
 </script>
 </body>
 </html>
-      `,{headers:{"content‑type":"text/html;charset=utf‑8"}})
+      `, { headers: { "content-type": "text/html;charset=utf-8" } })
     }
 
-    //过滤接口
-    if(path === "/filter"){
+    if (path === "/filter") {
       const src = url.searchParams.get("src");
-      if(!src) return new Response("错误：缺少 url 参数",{status:200});
-      try{
+      if (!src) return new Response("错误：缺少 src 参数", { status: 200 });
+      try {
         const res = await fetch(src);
         let text = await res.text();
-        //只保留端口443的行
-        const lines = text.split('\n').filter(line=>line.includes(':443'));
-        return new Response(lines.join('\n'),{headers:{"content‑type":"text/plain;charset=utf‑8"}})
-      }catch(e){
-        return new Response("订阅拉取失败："+e.message,{status:500})
+        const lines = text.split('\n').filter(line => line.includes(':443'));
+        return new Response(lines.join('\n'), { headers: { "content-type": "text/plain;charset=utf-8" } })
+      } catch (e) {
+        return new Response("订阅拉取失败：" + e.message, { status: 500 })
       }
     }
-    return new Response("404",{status:404})
+    return new Response("404 Not Found", { status: 404 })
   }
 }
