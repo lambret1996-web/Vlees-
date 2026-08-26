@@ -17,7 +17,7 @@ export default {
   :root{
     --bg1:#0f172a;
     --bg2:#111827;
-    --card:#ffffff;
+    --card:rgba(255,255,255,.96);
     --text:#0f172a;
     --muted:#64748b;
     --primary:#2563eb;
@@ -40,41 +40,27 @@ export default {
     color:#fff;
     padding:24px;
   }
-  .wrap{
-    max-width:820px;
-    margin:0 auto;
-  }
-  .hero{
-    text-align:center;
-    margin:18px 0 22px;
-  }
-  .hero h1{
-    margin:0;
-    font-size:clamp(26px, 4vw, 40px);
-    letter-spacing:.5px;
-  }
-  .hero p{
-    margin:10px 0 0;
-    color:rgba(255,255,255,.78);
-    line-height:1.7;
-    font-size:14px;
+  .wrap{max-width:900px;margin:0 auto}
+  .hero{text-align:center;margin:18px 0 22px}
+  .hero h1{margin:0;font-size:clamp(26px, 4vw, 40px)}
+  .hero p{margin:10px 0 0;color:rgba(255,255,255,.78);line-height:1.7;font-size:14px}
+  .tag{
+    display:inline-block;
+    padding:4px 10px;
+    border-radius:999px;
+    background:rgba(255,255,255,.12);
+    color:#fff;
+    font-size:12px;
+    margin:8px 4px 0;
   }
   .card{
-    background:rgba(255,255,255,.96);
+    background:var(--card);
     color:var(--text);
-    border:1px solid rgba(255,255,255,.35);
     border-radius:var(--radius);
     box-shadow:var(--shadow);
     padding:20px;
-    backdrop-filter: blur(8px);
   }
-  .label{
-    display:block;
-    font-size:14px;
-    font-weight:700;
-    margin-bottom:10px;
-    color:#111827;
-  }
+  .label{display:block;font-size:14px;font-weight:700;margin-bottom:10px}
   .input{
     width:100%;
     border:1px solid var(--border);
@@ -82,8 +68,6 @@ export default {
     padding:14px 16px;
     font-size:15px;
     outline:none;
-    transition:.2s ease;
-    background:#fff;
   }
   .input:focus{
     border-color:#93c5fd;
@@ -91,7 +75,7 @@ export default {
   }
   .btns{
     display:grid;
-    grid-template-columns:repeat(2, minmax(0, 1fr));
+    grid-template-columns:repeat(2,minmax(0,1fr));
     gap:10px;
     margin-top:14px;
   }
@@ -105,50 +89,22 @@ export default {
     transition:.18s ease;
     color:#fff;
     background:var(--primary);
-    box-shadow:0 8px 18px rgba(37,99,235,.18);
   }
   .btn:hover{transform:translateY(-1px);background:var(--primary2)}
-  .btn:disabled{
-    opacity:.5;
-    cursor:not-allowed;
-    transform:none;
-  }
-  .btn.secondary{
-    background:#334155;
-    box-shadow:0 8px 18px rgba(51,65,85,.12);
-  }
-  .btn.success{
-    background:var(--success);
-    box-shadow:0 8px 18px rgba(22,163,74,.14);
-  }
-  .btn.warning{
-    background:var(--warning);
-    box-shadow:0 8px 18px rgba(245,158,11,.14);
-    color:#111827;
-  }
+  .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+  .secondary{background:#334155}
+  .success{background:var(--success)}
+  .warning{background:var(--warning);color:#111827}
   .output{
     margin-top:16px;
-    display:grid;
-    gap:10px;
-  }
-  .meta{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    margin-top:8px;
-    font-size:13px;
-    color:var(--muted);
-  }
-  .box{
     border:1px dashed #cbd5e1;
     border-radius:14px;
     padding:12px 14px;
     background:#f8fafc;
     word-break:break-all;
     white-space:pre-wrap;
-    min-height:56px;
+    min-height:62px;
     line-height:1.6;
-    color:#0f172a;
   }
   .hint{
     margin-top:12px;
@@ -160,21 +116,7 @@ export default {
     border-radius:14px;
     padding:12px 14px;
   }
-  .footer{
-    text-align:center;
-    margin-top:16px;
-    color:rgba(255,255,255,.6);
-    font-size:12px;
-  }
-  .tag{
-    display:inline-block;
-    padding:4px 10px;
-    border-radius:999px;
-    background:rgba(255,255,255,.12);
-    color:#fff;
-    font-size:12px;
-    margin:6px 4px 0;
-  }
+  .footer{text-align:center;margin-top:16px;color:rgba(255,255,255,.6);font-size:12px}
   @media (max-width:640px){
     .card{padding:16px}
     .btns{grid-template-columns:1fr}
@@ -185,34 +127,30 @@ export default {
   <div class="wrap">
     <div class="hero">
       <h1>443订阅过滤器</h1>
-      <p>输入原始订阅链接，自动过滤出包含 <b>:443</b> 的节点，并支持一键复制、打开圈X和小火箭导入。</p>
-      <span class="tag">Cloudflare Worker</span>
+      <p>输入原始订阅链接，自动筛选出包含 <b>:443</b> 的节点，并提供复制、圈X、小火箭快捷入口。</p>
+      <span class="tag">Cloudflare Workers</span>
       <span class="tag">订阅过滤</span>
-      <span class="tag">iOS/Android</span>
+      <span class="tag">移动端适配</span>
     </div>
 
     <div class="card">
       <label class="label" for="subInput">粘贴原始订阅链接</label>
-      <input id="subInput" class="input" placeholder="例如：https://example.com/sub 或 example.com/sub">
+      <input id="subInput" class="input" placeholder="例如：https://example.com/sub">
 
       <div class="btns">
         <button class="btn" onclick="gen()">生成过滤后的订阅地址</button>
         <button class="btn secondary" id="copyBtn" onclick="copyLink()" disabled>一键复制链接</button>
-        <button class="btn success" id="quantumBtn" onclick="openQuantum()" disabled>一键导入圈X</button>
-        <button class="btn warning" id="surgeBtn" onclick="openSurge()" disabled>一键导入小火箭</button>
+        <button class="btn success" id="qxBtn" onclick="openApp('qx')" disabled>一键导入圈X</button>
+        <button class="btn warning" id="srBtn" onclick="openApp('sr')" disabled>一键导入小火箭</button>
       </div>
 
-      <div class="output">
-        <div class="meta" id="metaInfo"></div>
-        <div id="out" class="box">请先输入订阅链接，然后点击“生成过滤后的订阅地址”。</div>
-      </div>
+      <div id="out" class="output">请先输入订阅链接，然后点击“生成过滤后的订阅地址”。</div>
 
       <div class="hint">
-        <b>使用说明：</b><br>
-        1. 先生成过滤后的订阅链接；<br>
-        2. 可直接复制链接；<br>
-        3. 点击“导入圈X / 小火箭”会尝试打开对应 App 的订阅导入；<br>
-        4. 若手机系统未自动拉起 App，请直接复制链接到 App 内导入。
+        <b>说明：</b><br>
+        1. 先生成过滤链接；<br>
+        2. “一键导入”会尝试拉起对应 App；<br>
+        3. 若 App 未能自动打开，可直接复制链接到 App 内手动导入。<br>
       </div>
     </div>
 
@@ -222,14 +160,10 @@ export default {
 <script>
 let finalUrl = "";
 
-function setOutput(msg){
-  document.getElementById('out').innerText = msg;
-}
-
 function setButtons(enabled){
   document.getElementById('copyBtn').disabled = !enabled;
-  document.getElementById('quantumBtn').disabled = !enabled;
-  document.getElementById('surgeBtn').disabled = !enabled;
+  document.getElementById('qxBtn').disabled = !enabled;
+  document.getElementById('srBtn').disabled = !enabled;
 }
 
 function gen(){
@@ -238,91 +172,54 @@ function gen(){
     alert('请粘贴订阅链接');
     return;
   }
-
   const params = new URLSearchParams();
   params.set("src", origin);
   finalUrl = location.origin + "/filter?" + params.toString();
-
-  setOutput(finalUrl);
+  document.getElementById('out').innerText = finalUrl;
   setButtons(true);
-
-  document.getElementById('metaInfo').innerHTML = `
-    <span>状态：已生成</span>
-    <span>原始链接：${escapeHtml(origin)}</span>
-  `;
 }
 
 async function copyLink(){
   try{
     await navigator.clipboard.writeText(finalUrl);
     alert("复制成功！");
-  }catch(err){
+  }catch(e){
     alert("复制失败，请手动复制");
   }
 }
 
-function openQuantum(){
+function openApp(type){
   if(!finalUrl){ alert("请先生成订阅链接"); return; }
 
-  // 常见圈X方案：尝试通过订阅链接打开；如果系统不支持，会失败后提示复制
-  const schemeList = [
-    "quantumult-x://",
-    "quantumult://"
-  ];
-
-  openWithFallback(schemeList, finalUrl, "圈X");
-}
-
-function openSurge(){
-  if(!finalUrl){ alert("请先生成订阅链接"); return; }
-
-  // 常见小火箭方案：尝试通过 subscheme 打开
-  const schemeList = [
-    "surge://x-callback-url/add-subscription?url=" + encodeURIComponent(finalUrl),
-    "shadowrocket://addsub?url=" + encodeURIComponent(finalUrl)
-  ];
-
-  openWithFallback(schemeList, finalUrl, "小火箭");
-}
-
-function openWithFallback(schemes, urlToCopy, appName){
-  let index = 0;
-
-  const tryNext = () => {
-    if(index >= schemes.length){
-      fallbackCopy(urlToCopy, appName);
-      return;
-    }
-
-    const scheme = schemes[index++];
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = scheme;
-    document.body.appendChild(iframe);
-
-    setTimeout(() => {
-      document.body.removeChild(iframe);
-      tryNext();
-    }, 700);
+  // 直接给用户准备好链接，同时尝试打开 App
+  const tryOpen = (scheme) => {
+    const a = document.createElement('a');
+    a.href = scheme;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
-  tryNext();
-}
-
-async function fallbackCopy(urlToCopy, appName){
-  try{
-    await navigator.clipboard.writeText(urlToCopy);
-  }catch(e){}
-  alert(appName + " 自动拉起失败，已帮你准备好订阅链接，请手动在 App 中导入或粘贴。");
-}
-
-function escapeHtml(str){
-  return str
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
+  if(type === 'qx'){
+    // 圈X：不同版本支持情况不一，这里优先尝试通用方式
+    tryOpen('quantumult-x://');
+    setTimeout(async () => {
+      try {
+        await navigator.clipboard.writeText(finalUrl);
+      } catch(e){}
+      alert('已尝试打开圈X。如未自动导入，请在圈X中手动添加该订阅链接，或直接复制链接。');
+    }, 500);
+  }else{
+    // 小火箭：常见订阅导入方式
+    tryOpen('shadowrocket://addsub?url=' + encodeURIComponent(finalUrl));
+    setTimeout(async () => {
+      try {
+        await navigator.clipboard.writeText(finalUrl);
+      } catch(e){}
+      alert('已尝试打开小火箭。如未自动导入，请在小火箭中手动添加该订阅链接，或直接复制链接。');
+    }, 500);
+  }
 }
 </script>
 </body>
@@ -340,17 +237,20 @@ function escapeHtml(str){
 
       try {
         const res = await fetch(src, { redirect: "follow" });
-        let text = await res.text();
+        const text = await res.text();
 
-        let decoded;
+        let decoded = text;
+
+        // 更稳妥的 base64 判断：简单尝试解码，不成功就原样使用
         try {
-          decoded = Buffer.from(text, "base64").toString("utf8");
-        } catch (e) {
-          decoded = text;
-        }
+          const cleaned = text.replace(/\s+/g, "");
+          if (/^[A-Za-z0-9+/=]+$/.test(cleaned)) {
+            decoded = atob(cleaned);
+          }
+        } catch (e) {}
 
         const lines = decoded
-          .split('\n')
+          .split(/\r?\n/)
           .map(line => line.trim())
           .filter(line => line.includes(':443'));
 
