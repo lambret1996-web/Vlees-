@@ -88,7 +88,7 @@ function clearAll(){
   btnSR.disabled = true;
 }
 
-//一键导入圈X
+//一键导入圈X1
 function openQX(){
   window.location.href = `quantumult-x:///import-subscription?url=${encodeURIComponent(finalUrl)}`;
 }
