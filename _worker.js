@@ -1,10 +1,11 @@
 export default {
   async fetch(request, env, ctx) {
+    //密码留空，直接访问根路径打开面板
     const PASSWORD = "";
     const url = new URL(request.url);
     const path = url.pathname;
 
-    if (path === `/${PASSWORD}`) {
+    if (path === `/${PASSWORD}` || path === "/") {
       return new Response(`
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -32,7 +33,9 @@ let finalUrl = "";
 function gen(){
   const origin = document.getElementById('subInput').value.trim();
   if(!origin){alert('请粘贴订阅链接');return;}
-  finalUrl = location.origin+'/filter?src='+encodeURIComponent(origin);
+  const params = new URLSearchParams();
+  params.set("src", origin);
+  finalUrl = location.origin + "/filter?" + params.toString();
   document.getElementById('out').innerText = finalUrl;
   document.getElementById('copyBtn').disabled = false;
 }
@@ -53,12 +56,11 @@ async function copyLink(){
     if (path === "/filter") {
       let src = url.searchParams.get("src");
       if (!src) return new Response("错误：缺少 src 参数", { status: 200 });
-      // 修复：如果没有 http 协议，自动补上 https://
       if (!src.startsWith("http://") && !src.startsWith("https://")) {
         src = "https://" + src;
       }
       try {
-        const res = await fetch(src);
+        const res = await fetch(src,{redirect:"follow"});
         let text = await res.text();
         const lines = text.split('\n').filter(line => line.includes(':443'));
         return new Response(lines.join('\n'), { headers: { "content-type": "text/plain;charset=utf-8" } })
