@@ -51,8 +51,12 @@ async function copyLink(){
     }
 
     if (path === "/filter") {
-      const src = url.searchParams.get("src");
+      let src = url.searchParams.get("src");
       if (!src) return new Response("错误：缺少 src 参数", { status: 200 });
+      // 修复：如果没有 http 协议，自动补上 https://
+      if (!src.startsWith("http://") && !src.startsWith("https://")) {
+        src = "https://" + src;
+      }
       try {
         const res = await fetch(src);
         let text = await res.text();
