@@ -1,6 +1,6 @@
 export default {
   async fetch(request, env, ctx) {
-    const PASSWORD = "66668888";
+    const PASSWORD = "";
     const url = new URL(request.url);
     const path = url.pathname;
 
