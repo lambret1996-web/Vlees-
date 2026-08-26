@@ -13,31 +13,41 @@ export default {
 <meta name="viewport" content="width=device-width, initial‑scale=1.0">
 <title>443订阅过滤器</title>
 <style>
-body{padding:20px;font-family:system-ui}
-input{width:100%;padding:10px;margin:10px 0;box-sizing:border-box}
-button{padding:10px 16px;font-size:16px;margin:4px 2px}
-pre{margin-top:12px;white‑space:pre‑wrap;background:#f4f4f4;padding:12px;border‑radius:6px;word‑break:break‑all}
+*{box-sizing:border-box}
+body{padding:24px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;max-width:720px;margin:0 auto;background:#f8f9fa}
+h2{margin-top:0;margin-bottom:16px;color:#222}
+#subInput{width:100%;padding:12px 14px;font-size:16px;border:1px solid #ddd;border-radius:8px;margin-bottom:14px}
+.btn-group{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+button{padding:10px 16px;font-size:15px;border:none;border-radius:8px;cursor:pointer;background:#4088e8;color:#fff}
+button:active{opacity:0.85}
+#out{width:100%;padding:14px;background:#ffffff;border:1px solid #e5e7eb;border-radius:8px;white-space:pre-wrap;word-break:break-all;min-height:100px;font-size:14px;color:#333}
 </style>
 </head>
 <body>
 <h2>填入原始订阅链接</h2>
 <input id="subInput" placeholder="粘贴订阅地址">
-<div>
-<button onclick="gen()">生成过滤后的订阅地址</button>
-<button id="copyBtn" onclick="copyLink()" disabled>一键复制链接</button>
+<div class="btn-group">
+  <button onclick="gen()">生成过滤后的订阅地址</button>
+  <button id="copyBtn" onclick="copyLink()" disabled>一键复制链接</button>
+  <button onclick="clearAll()">一键清空</button>
 </div>
 <pre id="out"></pre>
 <script>
 let finalUrl = "";
+const inputEl = document.getElementById('subInput');
+const outEl = document.getElementById('out');
+const copyBtn = document.getElementById('copyBtn');
+
 function gen(){
-  const origin = document.getElementById('subInput').value.trim();
+  const origin = inputEl.value.trim();
   if(!origin){alert('请粘贴订阅链接');return;}
   const params = new URLSearchParams();
   params.set("src", origin);
   finalUrl = location.origin + "/filter?" + params.toString();
-  document.getElementById('out').innerText = finalUrl;
-  document.getElementById('copyBtn').disabled = false;
+  outEl.innerText = finalUrl;
+  copyBtn.disabled = false;
 }
+
 async function copyLink(){
   try{
     await navigator.clipboard.writeText(finalUrl);
@@ -45,6 +55,14 @@ async function copyLink(){
   }catch(err){
     alert("复制失败，请手动选中复制");
   }
+}
+
+//新增：一键清空
+function clearAll(){
+  inputEl.value = '';
+  outEl.innerText = '';
+  finalUrl = "";
+  copyBtn.disabled = true;
 }
 </script>
 </body>
@@ -64,7 +82,6 @@ async function copyLink(){
 
         let decoded;
         try{
-          // Cloudflare环境使用Buffer解码base64，不用浏览器atob
           decoded = Buffer.from(text, 'base64').toString('utf8');
         }catch(e){
           decoded = text;
